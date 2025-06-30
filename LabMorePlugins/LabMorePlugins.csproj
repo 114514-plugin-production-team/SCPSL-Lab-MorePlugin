@@ -49,6 +49,9 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>D:\plugins\SCP SL(do not know version)\0Harmony.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\Desktop\SCPSL14.1SERVER\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
@@ -58,14 +61,24 @@
     <Reference Include="CommandSystem.Core">
       <HintPath>..\..\..\..\Desktop\SCPSL14.1SERVER\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\CommandSystem.Core.dll</HintPath>
     </Reference>
+    <Reference Include="HintServiceMeow-LabAPI">
+      <HintPath>..\..\..\..\Downloads\HintServiceMeow-LabAPI.dll</HintPath>
+    </Reference>
     <Reference Include="LabApi, Version=1.0.2.0, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>..\packages\Northwood.LabAPI.1.0.2\lib\net48\LabApi.dll</HintPath>
     </Reference>
     <Reference Include="Mirror">
       <HintPath>..\..\..\..\Desktop\SCPSL14.1SERVER\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Mirror.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\plugins\SCP SL(do not know version)\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="NorthwoodLib">
       <HintPath>..\..\..\..\Desktop\SCPSL14.1SERVER\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\NorthwoodLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Pooling">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Pooling.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -86,16 +99,22 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="API\Events.cs" />
     <Compile Include="API\SAPI.cs" />
+    <Compile Include="API\SRoleSystem.cs" />
+    <Compile Include="API\SSSS.cs" />
     <Compile Include="Class1.cs" />
+    <Compile Include="Enums\RoleName.cs" />
+    <Compile Include="Enums\SCP914Enum.cs" />
+    <Compile Include="Enums\ZoneNum.cs" />
+    <Compile Include="Patchs\SCPChannelFixSecond.cs" />
+    <Compile Include="PlayerData.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Items\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
