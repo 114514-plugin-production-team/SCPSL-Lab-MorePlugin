@@ -102,8 +102,13 @@
     <Compile Include="API\Events.cs" />
     <Compile Include="API\SAPI.cs" />
     <Compile Include="API\SRoleSystem.cs" />
+    <Compile Include="API\SSSChat.cs" />
     <Compile Include="API\SSSS.cs" />
     <Compile Include="Class1.cs" />
+    <Compile Include="Commands\ACChat.cs" />
+    <Compile Include="Commands\BCChat.cs" />
+    <Compile Include="Commands\MyPos.cs" />
+    <Compile Include="Commands\TeamChat.cs" />
     <Compile Include="Enums\RoleName.cs" />
     <Compile Include="Enums\SCP914Enum.cs" />
     <Compile Include="Enums\ZoneNum.cs" />

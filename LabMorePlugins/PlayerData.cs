@@ -8,7 +8,8 @@ namespace LabMorePlugins
 {
     public class PlayerData
     {
-        public int Level { get; set; } = 1;
-        public int Exp { get; set; } = 0;
+        public string UserId { get; set; }
+        public int Level { get; set; }
+        public int Exp { get; set; }
     }
 }

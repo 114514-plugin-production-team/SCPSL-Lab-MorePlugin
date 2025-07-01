@@ -8,6 +8,6 @@ namespace LabMorePlugins.Enums
 {
     public enum RoleName
     {
-        SCP550,
+        SCP181,
     }
 }

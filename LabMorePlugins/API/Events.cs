@@ -1,5 +1,7 @@
-﻿using HintServiceMeow.Core.Extension;
+﻿using CustomPlayerEffects;
+using HintServiceMeow.Core.Extension;
 using HintServiceMeow.Core.Models.Hints;
+using HintServiceMeow.UI.Extension;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Arguments.Scp914Events;
 using LabApi.Events.Arguments.ServerEvents;
@@ -11,6 +13,7 @@ using MEC;
 using PlayerRoles;
 using PlayerRoles.PlayableScps.Scp079;
 using PlayerRoles.Spectating;
+using PlayerRoles.Subroutines;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,8 +26,155 @@ namespace LabMorePlugins.API
 {
     public class Events:CustomEventsHandler
     {
+        public static bool IsLabby = false;
+        public static List<ushort> SCP1068 = new List<ushort>();
+        public static List<ushort> SCP1056 = new List<ushort>();
+        public static System.Random Random = new System.Random();
+        public override void OnPlayerEscaping(PlayerEscapingEventArgs ev)
+        {
+            if (ev.Player == null)
+                return;
+            if (ev.Player.Role == RoleTypeId.FacilityGuard)
+            {
+                if (Plugin.Instance.Config.FFcanEsx)
+                {
+                    ev.NewRole = Plugin.Instance.Config.BAESCRoleName;
+                }
+            }
+        }
+        public override void OnPlayerInteractedDoor(PlayerInteractedDoorEventArgs ev)
+        {
+            if (ev.Player == null)
+                return;
+            if (SRoleSystem.IsRole(ev.Player.PlayerId, RoleName.SCP181)&&Random.Next(1, 5) >= 2&&!ev.Door.IsLocked&&!ev.Door.IsOpened)
+            {
+                ev.Door.IsOpened = true;
+                ev.Player.GetPlayerUi().CommonHint.ShowOtherHint("你打开了这道权限门",6);
+            }
+        }
+        public override void OnServerRoundStarted()
+        {
+            var SCP1056Item = ItemType.Medkit.SpawnItem(RoleTypeId.ClassD.GetRandomSpawnLocation());
+            SCP1056.Add(SCP1056Item.Serial);
+            var SCP1068Item = ItemType.SCP2176.SpawnItem(RoleTypeId.Scp096.GetRandomSpawnLocation());
+            SCP1068.Add(SCP1068Item.Serial);
+            var SCP181 = SAPI.GetRandomSpecialPlayer(RoleTypeId.ClassD);
+            SRoleSystem.Add(RoleName.SCP181, SCP181.PlayerId);
+            SCP181.setRankName("SCP-181", "pick");
+            SCP181.SendHint("你是[SCP181]\n你的运气很好|概率打开一个权限门", 20);
+        }
+        public override void OnServerRoundStarting(RoundStartingEventArgs ev)
+        {
+            IsLabby = false;
+            foreach (var item in Player.List)
+            {
+                item.SetRole(RoleTypeId.Spectator);
+            }
+        }
+        public override void OnServerWaitingForPlayers()
+        {
+            IsLabby = true;
+            short StartTime = GameCore.RoundStart.singleton.NetworkTimer;
+            UnityEngine.GameObject.Find("RoundStart").gameObject.transform.localScale = Vector3.zero;
+            AdminToy.TryGet(new AdminToys.ShootingTarget(), out var adminToy);
+            adminToy.Position = RoleTypeId.Tutorial.GetRandomSpawnLocation();
+            adminToy.Spawn();
+            Hint hint = new Hint()
+            {
+                AutoText = a =>
+                {
+                    string Infp = "";
+                    if (IsLabby == true)
+                    {
+                        if (Player.List.Count >= 2)
+                        {
+                            Infp = $"回合即将开始|服务器人数[{Player.List.Count}]\n倒计时[{StartTime}]";
+                        }
+                        else
+                        {
+                            Infp = $"回合已锁|服务器人数[{Player.List.Count}]";
+                        }
+                    }
+                    else if (Round.IsLobbyLocked)
+                    {
+                        Infp = $"回合已锁|服务器人数[{Player.List.Count}]";
+                    }
+                    else if (IsLabby)
+                    {
+                        Infp = $"";
+                    }
+                    return Infp;
+                },
+                YCoordinate = 100,
+                Alignment = HintServiceMeow.Core.Enum.HintAlignment.Center,
+                FontSize = 25,
+            };
+            foreach (var item in Player.List)
+            {
+                if (IsLabby == true)
+                {
+                    item.AddHint(hint);
+                }
+            }
+        }
+        public override void OnPlayerThrewItem(PlayerThrewItemEventArgs ev)
+        {
+            if (ev.Player == null)
+                return;
+            if (SCP1068.Contains(ev.Pickup.Serial))
+            {
+                Warhead.Shake();
+            }
+        }
+        public override void OnPlayerLeft(PlayerLeftEventArgs ev)
+        {
+            Plugin.Instance.SavePlayerData();
+            GameCore.Console.AddLog($"玩家{ev.Player.Nickname}离开了服务器|Steam64ID为{ev.Player.UserId}|已保存经验信息", Color.blue);
+        }
         public override void OnPlayerChangingRole(PlayerChangingRoleEventArgs ev)
         {
+            if (ev.NewRole == RoleTypeId.Spectator)
+            {
+                var TotalTime = SpawnProtected.SpawnDuration;
+                var NtfSpawnWave = RespawnWaves.Get(new Respawning.Waves.NtfSpawnWave());
+                var CISpawnWave = RespawnWaves.Get(new Respawning.Waves.ChaosSpawnWave());
+                string NextTeam = "[不知道]";
+                if (CISpawnWave.RespawnTokens == 0 && NtfSpawnWave.RespawnTokens > 0)
+                {
+                    NextTeam = "[<color=blue>九尾特遣队</color>]";
+                }
+                else if (NtfSpawnWave.RespawnTokens == 0 && CISpawnWave.RespawnTokens > 0)
+                {
+                    NextTeam = "[<color=green>混沌特遣队</color>]";
+                }
+                else if (NtfSpawnWave.RespawnTokens == 0 && CISpawnWave.RespawnTokens == 0)
+                {
+                    NextTeam = "[无可用支援]";
+                }
+                else if ((int)NtfSpawnWave.TimeLeft < (int)CISpawnWave.TimeLeft)
+                {
+                    NextTeam = "[<color=blue>九尾特遣队</color>]";
+                }
+                else if ((int)CISpawnWave.TimeLeft < (int)NtfSpawnWave.TimeLeft)
+                {
+                    NextTeam = "[<color=green>混沌特遣队</color>]";
+                }
+                else
+                {
+                    NextTeam = "[不知道]";
+                }
+                Hint hint = new Hint()
+                {
+                    AutoText = g =>
+                    {
+                        return $"你还剩[{TotalTime}]秒就可以去白给了\n下一波刷{NextTeam}\n九尾狐时间[{NtfSpawnWave.TimeLeft}]\n混沌时间[{CISpawnWave.TimeLeft}]";
+                    },
+                    YCoordinate = 600,
+                    Alignment = HintServiceMeow.Core.Enum.HintAlignment.Right,
+                    FontSize = 25
+                };
+                ev.Player.AddHint(hint);
+            }
             if (ev.NewRole == RoleTypeId.Spectator)
             {
                 Hint sphint = new Hint()
@@ -48,9 +198,61 @@ namespace LabMorePlugins.API
                 };
                 ev.Player.GetPlayerDisplay().AddHint(sphint);
             }
+            if (ev.Player.Team == Team.SCPs)
+            {
+                Hint hint = new Hint()
+                {
+                    AutoText = g =>
+                    {
+                        string SCPInfo = "<color=red>------</color>\n";
+                        int ZombieCount = 0;
+                        foreach (Player player in Player.List)
+                        {
+                            if (player.Team == Team.SCPs)
+                            {
+                                switch(player.Role)
+                                {
+                                    case RoleTypeId.Scp049:
+                                    case RoleTypeId.Scp173:
+                                    case RoleTypeId.Scp096:
+                                    case RoleTypeId.Scp106:
+                                    case RoleTypeId.Scp939:
+                                    case RoleTypeId.Scp3114:
+                                        SCPInfo += $"{GetSCPName(player)}";
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                if (player.Role == RoleTypeId.Scp0492)
+                                {
+                                    ZombieCount++;
+                                }
+                                if (player.RoleBase is Scp079Role scp079)
+                                {
+                                    scp079.SubroutineModule.TryGetSubroutine(out Scp079AuxManager scp079AuxManager);
+                                    scp079.SubroutineModule.TryGetSubroutine(out Scp079TierManager scp079TierManager);
+                                    SCPInfo += $"<color=red>SCP079[在线] =>[Lv.{scp079TierManager.AccessTierLevel}|电力:{scp079AuxManager.CurrentAux}]\n</color>";
+                                }
+                            }
+                        }
+                        return SCPInfo + $"<color=red>\n------\n小僵尸数量[{ZombieCount}]</color>";
+                    },
+                };
+            }
+        }
+        public static string GetSCPName(Player player)
+        {
+            return $"<color=red>[{player.Role}] => [HP:{player.Health} AHP:{player.ArtificialHealth}]</color>\n";
         }
         public override void OnPlayerJoined(PlayerJoinedEventArgs ev)
         {
+            if (IsLabby == true)
+            {
+                ev.Player.SetRole(RoleTypeId.Tutorial);
+                ev.Player.AddItem(ItemType.GunFRMG0);
+                ev.Player.AddItem(ItemType.Coin);
+
+            }
             Plugin.Instance.SavePlayerData();
             Timing.CallDelayed(0.1f, () =>
             {
@@ -87,7 +289,7 @@ namespace LabMorePlugins.API
             {
                 if (ev.Attacker.Role == PlayerRoles.RoleTypeId.Scp106)
                 {
-                    if (!SRoleSystem.IsRole(ev.Player.PlayerId, Enums.RoleName.SCP550)&&Plugin.Instance.Config.SCP106Pock)
+                    if (Plugin.Instance.Config.SCP106Pock)
                     {
                         ev.Player.EnableEffect(new CustomPlayerEffects.PocketCorroding());
                     }
@@ -99,6 +301,7 @@ namespace LabMorePlugins.API
         {
             if (ev.Player != null&&ev.Attacker!=null)
             {
+                SRoleSystem.RemoveRole(ev.Player.PlayerId);
                 ev.Player.setRankName("", "");
                 ev.Player.SetScale(Vector3.one);
                 ev.Player.DisableAllEffects();
@@ -182,9 +385,12 @@ namespace LabMorePlugins.API
         }
         public override void OnPlayerUsedItem(PlayerUsedItemEventArgs ev)
         {
-            if (ev.Player!=null)
+            if (ev.Player == null)
+                return;
+            if (SCP1056.Contains(ev.UsableItem.Serial))
             {
-                
+                ev.Player.SetScale(new Vector3(0.5f, 0.5f, 0.5f));
+                ev.Player.SendHint("变小了awa", 5);
             }
         }
         public override void OnPlayerInteractingDoor(PlayerInteractingDoorEventArgs ev)

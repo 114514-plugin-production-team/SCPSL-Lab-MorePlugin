@@ -18,7 +18,18 @@ namespace LabMorePlugins.API
     {
         public static void SetScale(this Player player, Vector3 vector3)
         {
-            player.GameObject.transform.localPosition = vector3;
+            player.GameObject.transform.localScale = vector3;
+        }
+        public static bool IsRA(this Player player)
+        {
+            if (player.RemoteAdminAccess||player.ReferenceHub.isOwned)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         public static Vector3 GetRandomSpawnLocation(this RoleTypeId roleType)
         {
@@ -42,6 +53,12 @@ namespace LabMorePlugins.API
             player.ReferenceHub.serverRoles.SetColor(color);
             player.ReferenceHub.serverRoles.SetText(name);
         }
+        public static Pickup SpawnItem(this ItemType itemType, Vector3 pos)
+        {
+            Pickup pickup = Pickup.Create(itemType, pos);
+            return pickup;
+        }
+
         public static string GetRoleName(this RoleTypeId role)
         {
             switch (role)

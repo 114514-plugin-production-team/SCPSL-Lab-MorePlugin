@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PlayerRoles;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -10,6 +11,10 @@ namespace LabMorePlugins
     public class Class1
     {
         public bool IsEnabled { get; set; } = true;
+        [Description("保安是否能下班")]
+        public bool FFcanEsx { get; set; } = true;
+        [Description("保安下班变成什么角色（如果FFcanEsx为true）")]
+        public RoleTypeId BAESCRoleName { get; set; } = RoleTypeId.NtfCaptain;
         [Description("SCP杀人类获得多少积分")]
         public int SCPKillPeople { get; set; } = 20;
         [Description("人类杀人类获得多少积分")]

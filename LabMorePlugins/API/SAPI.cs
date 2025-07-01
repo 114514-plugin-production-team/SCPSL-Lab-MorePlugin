@@ -17,6 +17,20 @@ namespace LabMorePlugins.API
     {
         public static Random Random = new Random();
         public static List<Player> SpecialPlayerList = new List<Player>();
+        public static IEnumerable<Player> GetRole(RoleTypeId role)
+        {
+            return from player in Player.List
+                   where player.Role == role
+                   select player;
+        }
+        public static IEnumerable<Player> GetTeam(Team team)
+        {
+            return from player in Player.List
+                   where player.Team == team
+                   select player;
+        }
+
+
         public static Room GetRandomRoom()
         {
             List<Room> rooms = Room.List.ToList();
@@ -55,6 +69,10 @@ namespace LabMorePlugins.API
             }
 
             return null;
+        }
+        public static void SpawnItem(Vector3 pos, ItemType itemType)
+        {
+            Pickup.Create(itemType, pos);
         }
         public static Player GetRandomSpecialPlayer(RoleTypeId roleTypeId)
         {

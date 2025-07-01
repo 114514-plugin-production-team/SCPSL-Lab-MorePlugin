@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using HintServiceMeow.UI.Extension;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.Handlers;
 using LabApi.Features.Console;
@@ -47,6 +48,10 @@ namespace LabMorePlugins
                 Directory.CreateDirectory(expFolder);
 
             dataFilePath = Path.Combine(expFolder, $"{Server.Port}-Exp.json");
+            if(!File.Exists(dataFilePath))
+            {
+                File.Create(dataFilePath);
+            }
             LoadPlayerData();
             var harmony = new Harmony("hui.sl.moreplugin");
             harmony.PatchAll();
@@ -121,6 +126,14 @@ namespace LabMorePlugins
                 if (ev.Player.Role == PlayerRoles.RoleTypeId.ClassD)
                 {
                     ev.Player.AddItem(ItemType.KeycardJanitor);
+                }
+                if (ev.Player.Role == PlayerRoles.RoleTypeId.FacilityGuard)
+                {
+                    ev.Player.ClearInventory();
+                    ev.Player.AddItem(ItemType.GunE11SR);
+                    ev.Player.AddItem(ItemType.ArmorLight);
+                    ev.Player.AddItem(ItemType.KeycardMTFPrivate);
+                    ev.Player.GetPlayerUi().CommonHint.ShowOtherHint("你得到了加强",6);
                 }
             }
         }
