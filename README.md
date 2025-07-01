@@ -10,6 +10,6 @@
 将"global.zip"解压出的文件复制到"%appdata%\SCP Secret Laboratory\LabAPI\dependencies\global"即可
 ## 引用依赖
 [HintServiceMeow](https://github.com/MeowServer/HintServiceMeow)\
-[Northwood.LabAPI](https://github.com/northwood-studios/LabAPI)\
+[Northwood.LabAPI](https://github.com/northwood-studios/LabAPI)
 ### 联系
 QQ:3145186196
