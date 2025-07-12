@@ -9,5 +9,6 @@ namespace LabMorePlugins.Enums
     public enum RoleName
     {
         SCP181,
+        SCP131,
     }
 }

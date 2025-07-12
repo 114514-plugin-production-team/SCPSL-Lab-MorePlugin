@@ -58,6 +58,9 @@
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\..\..\Desktop\SCPSL14.1SERVER\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
+    <Reference Include="AudioPlayerApi">
+      <HintPath>..\..\..\..\Downloads\archive-2025-07-11T233132+0800.tar\archive-2025-07-11T233132+0800\EXILED\Plugins\dependencies\AudioPlayerApi.dll</HintPath>
+    </Reference>
     <Reference Include="CommandSystem.Core">
       <HintPath>..\..\..\..\Desktop\SCPSL14.1SERVER\SCP Secret Laboratory Dedicated Server\SCPSL_Data\Managed\CommandSystem.Core.dll</HintPath>
     </Reference>

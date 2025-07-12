@@ -2,13 +2,18 @@
 using HintServiceMeow.Core.Extension;
 using HintServiceMeow.Core.Models.Hints;
 using HintServiceMeow.UI.Extension;
+using InventorySystem.Items.Keycards;
+using InventorySystem.Items.MicroHID;
+using InventorySystem.Items.MicroHID.Modules;
 using LabApi.Events.Arguments.PlayerEvents;
+using LabApi.Events.Arguments.Scp173Events;
 using LabApi.Events.Arguments.Scp914Events;
 using LabApi.Events.Arguments.ServerEvents;
 using LabApi.Events.CustomHandlers;
 using LabApi.Features.Wrappers;
 using LabMorePlugins.Enums;
 using LabMorePlugins.Patchs;
+using MapGeneration.Distributors;
 using MEC;
 using PlayerRoles;
 using PlayerRoles.PlayableScps.Scp079;
@@ -29,6 +34,7 @@ namespace LabMorePlugins.API
         public static bool IsLabby = false;
         public static List<ushort> SCP1068 = new List<ushort>();
         public static List<ushort> SCP1056 = new List<ushort>();
+        public static List<ushort> HIDCDIY = new List<ushort>();
         public static System.Random Random = new System.Random();
         public override void OnPlayerEscaping(PlayerEscapingEventArgs ev)
         {
@@ -42,26 +48,59 @@ namespace LabMorePlugins.API
                 }
             }
         }
-        public override void OnPlayerInteractedDoor(PlayerInteractedDoorEventArgs ev)
-        {
-            if (ev.Player == null)
-                return;
-            if (SRoleSystem.IsRole(ev.Player.PlayerId, RoleName.SCP181)&&Random.Next(1, 5) >= 2&&!ev.Door.IsLocked&&!ev.Door.IsOpened)
-            {
-                ev.Door.IsOpened = true;
-                ev.Player.GetPlayerUi().CommonHint.ShowOtherHint("你打开了这道权限门",6);
-            }
-        }
         public override void OnServerRoundStarted()
         {
             var SCP1056Item = ItemType.Medkit.SpawnItem(RoleTypeId.ClassD.GetRandomSpawnLocation());
             SCP1056.Add(SCP1056Item.Serial);
             var SCP1068Item = ItemType.SCP2176.SpawnItem(RoleTypeId.Scp096.GetRandomSpawnLocation());
             SCP1068.Add(SCP1068Item.Serial);
+            var HIDCD = ItemType.Coin.SpawnItem(RoleTypeId.NtfCaptain.GetRandomSpawnLocation());
+            HIDCD.Transform.localScale = new Vector3(10f, 5f, 5f);
+            HIDCDIY.Add(HIDCD.Serial);
             var SCP181 = SAPI.GetRandomSpecialPlayer(RoleTypeId.ClassD);
             SRoleSystem.Add(RoleName.SCP181, SCP181.PlayerId);
             SCP181.setRankName("SCP-181", "pick");
             SCP181.SendHint("你是[SCP181]\n你的运气很好|概率打开一个权限门", 20);
+            if (Player.List.Count >= 10)
+            {
+                var SCP131 = SAPI.GetRandomSpecialPlayer(RoleTypeId.ClassD);
+                if (SCP131 !=null)
+                {
+                    SCP131.setRankName("SCP131", "yellow");
+                    SCP131.Position = RoleTypeId.Scientist.GetRandomSpawnLocation();
+                    SCP131.SetScale(new Vector3(0.5f, 0.5f, 0.5f));
+                    SRoleSystem.Add(RoleName.SCP131, SCP131.PlayerId);
+                    SCP131.MaxHealth = 60;
+                    SCP131.SendHint("你是[SCP131]|SCP173会因为你无法移动\n你不能捡任何东西", 15);
+                }
+            }
+            
+        }
+        public override void OnScp173AddingObserver(Scp173AddingObserverEventArgs ev)
+        {
+            if (SRoleSystem.IsRole(ev.Target.PlayerId, RoleName.SCP131))
+            {
+                ev.IsAllowed = false;
+            }
+        }
+
+        public override void OnPlayerPickingUpItem(PlayerPickingUpItemEventArgs ev)
+        {
+            if (ev.Player == null) return;
+            if (HIDCDIY.Contains(ev.Pickup.Serial))
+            {
+                if (ev.Player.CurrentItem.Base is InventorySystem.Items.MicroHID.MicroHIDItem micro)
+                {
+                    if (micro.TryGetSubcomponent(out EnergyManagerModule energyManagerModule)&&energyManagerModule.Energy >=50)
+                    {
+                        energyManagerModule.ServerSetEnergy(ev.Player.CurrentItem.Serial, energyManagerModule.Energy + 20);
+                    }
+                }
+            }
+            if (SRoleSystem.IsRole(ev.Player.PlayerId, RoleName.SCP131))
+            {
+                ev.IsAllowed = false;
+            }
         }
         public override void OnServerRoundStarting(RoundStartingEventArgs ev)
         {
@@ -75,7 +114,7 @@ namespace LabMorePlugins.API
         {
             IsLabby = true;
             short StartTime = GameCore.RoundStart.singleton.NetworkTimer;
-            UnityEngine.GameObject.Find("RoundStart").gameObject.transform.localScale = Vector3.zero;
+            UnityEngine.GameObject.Find("StartRound").gameObject.transform.localScale = Vector3.zero;
             AdminToy.TryGet(new AdminToys.ShootingTarget(), out var adminToy);
             adminToy.Position = RoleTypeId.Tutorial.GetRandomSpawnLocation();
             adminToy.Spawn();
@@ -301,6 +340,10 @@ namespace LabMorePlugins.API
         {
             if (ev.Player != null&&ev.Attacker!=null)
             {
+                if (SAPI.PlayerAudioPlayers.TryGetValue(ev.Player, out _))
+                {
+                    SAPI.RemovePlayerAudio(ev.Player);
+                }
                 SRoleSystem.RemoveRole(ev.Player.PlayerId);
                 ev.Player.setRankName("", "");
                 ev.Player.SetScale(Vector3.one);
@@ -395,12 +438,21 @@ namespace LabMorePlugins.API
         }
         public override void OnPlayerInteractingDoor(PlayerInteractingDoorEventArgs ev)
         {
+            if (ev.Player == null) return;
             foreach (var item in ev.Player.Items)
             {
-                if (item.Base is InventorySystem.Items.Keycards.KeycardItem)
+                if (item.Base is InventorySystem.Items.Keycards.KeycardItem keycardItem)
                 {
-                    
+                    if (SAPI.CheckKeycardAccess(keycardItem, ev.Door.Permissions))
+                    {
+                        ev.IsAllowed = true;
+                    }
                 }
+            }
+            if (SRoleSystem.IsRole(ev.Player.PlayerId, RoleName.SCP181) && Random.Next(1, 5) >= 2 && !ev.Door.IsLocked && !ev.Door.IsOpened)
+            {
+                ev.Door.IsOpened = true;
+                ev.Player.GetPlayerUi().CommonHint.ShowOtherHint("你打开了这道权限门", 6);
             }
         }
     }
