@@ -2,6 +2,8 @@
 using HintServiceMeow.Core.Extension;
 using HintServiceMeow.Core.Models.Hints;
 using HintServiceMeow.UI.Extension;
+using InventorySystem.Items.Firearms;
+using InventorySystem.Items.Firearms.Modules;
 using InventorySystem.Items.Keycards;
 using InventorySystem.Items.MicroHID;
 using InventorySystem.Items.MicroHID.Modules;
@@ -12,6 +14,7 @@ using LabApi.Events.Arguments.ServerEvents;
 using LabApi.Events.CustomHandlers;
 using LabApi.Features.Wrappers;
 using LabMorePlugins.Enums;
+using LabMorePlugins.Interfaces;
 using LabMorePlugins.Patchs;
 using MapGeneration.Distributors;
 using MEC;
@@ -19,8 +22,10 @@ using PlayerRoles;
 using PlayerRoles.PlayableScps.Scp079;
 using PlayerRoles.Spectating;
 using PlayerRoles.Subroutines;
+using RemoteAdmin;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -336,6 +341,16 @@ namespace LabMorePlugins.API
             }
 
         }
+        public override void OnServerCommandExecuted(CommandExecutedEventArgs ev)
+        {
+            if (ev.CommandType == LabApi.Features.Enums.CommandType.RemoteAdmin)
+            {
+                Player player = Player.Get(ev.Sender.SenderId);
+                var Time = DateTime.Now.ToString();
+                string AdminLog = $"[{Time}|{ev.Sender.SenderId}|{ev.Sender.Nickname}|{player.IpAddress}|{ev.CommandName}]";
+                File.AppendAllText(Plugin.AdminLogs, AdminLog);
+            }
+        }
         public override void OnPlayerDeath(PlayerDeathEventArgs ev)
         {
             if (ev.Player != null&&ev.Attacker!=null)
@@ -426,6 +441,18 @@ namespace LabMorePlugins.API
                 
             }
         }
+        public override void OnPlayerReloadingWeapon(PlayerReloadingWeaponEventArgs ev)
+        {
+            if(ev.FirearmItem.Base.TryGetSubcomponent(out Firearm firearm))
+            {
+                var Max = firearm.GetTotalMaxAmmo();
+                var Total = firearm.GetTotalStoredAmmo();
+                if (Max > Total)
+                {
+                    ev.Player.AddAmmo(ev.FirearmItem.Type, 55);
+                }
+            }
+        }
         public override void OnPlayerUsedItem(PlayerUsedItemEventArgs ev)
         {
             if (ev.Player == null)
@@ -449,11 +476,12 @@ namespace LabMorePlugins.API
                     }
                 }
             }
-            if (SRoleSystem.IsRole(ev.Player.PlayerId, RoleName.SCP181) && Random.Next(1, 5) >= 2 && !ev.Door.IsLocked && !ev.Door.IsOpened)
+            if (SRoleSystem.IsRole(ev.Player.PlayerId, RoleName.SCP181) && Random.Next(1, 5) >= 2 && !ev.Door.IsLocked)
             {
                 ev.Door.IsOpened = true;
                 ev.Player.GetPlayerUi().CommonHint.ShowOtherHint("你打开了这道权限门", 6);
             }
         }
+
     }
 }

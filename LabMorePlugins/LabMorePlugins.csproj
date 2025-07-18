@@ -102,6 +102,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ability\S106Black.cs" />
+    <Compile Include="API\AbilityManager.cs" />
     <Compile Include="API\Events.cs" />
     <Compile Include="API\SAPI.cs" />
     <Compile Include="API\SRoleSystem.cs" />
@@ -115,6 +117,9 @@
     <Compile Include="Enums\RoleName.cs" />
     <Compile Include="Enums\SCP914Enum.cs" />
     <Compile Include="Enums\ZoneNum.cs" />
+    <Compile Include="Interfaces\Ability.cs" />
+    <Compile Include="Interfaces\IAbility.cs" />
+    <Compile Include="MonoBehaviours\CooldownController.cs" />
     <Compile Include="Patchs\SCPChannelFixSecond.cs" />
     <Compile Include="PlayerData.cs" />
     <Compile Include="Plugin.cs" />

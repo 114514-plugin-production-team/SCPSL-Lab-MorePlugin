@@ -35,6 +35,7 @@ namespace LabMorePlugins
         public override Version RequiredApiVersion => new Version(LabApi.Features.LabApiProperties.CompiledVersion);
         public static Dictionary<string, PlayerData> playerData = new Dictionary<string, PlayerData>();
         private string dataFilePath;
+        public static string AdminLogs;
         public static readonly object KillCountsLock = new object();
         public static Dictionary<Player, int> killCounts = new Dictionary<Player, int>();
         public API.Events Events { get; set; } = new Events();
@@ -51,6 +52,11 @@ namespace LabMorePlugins
             if(!File.Exists(dataFilePath))
             {
                 File.Create(dataFilePath);
+            }
+            AdminLogs = Path.Combine(LabApi.Loader.Features.Paths.PathManager.LabApi.ToString(), "AdminLogs", Server.Port.ToString(), "Log.txt");
+            if (!File.Exists(AdminLogs))
+            {
+                File.Create (AdminLogs);
             }
             LoadPlayerData();
             var harmony = new Harmony("hui.sl.moreplugin");
