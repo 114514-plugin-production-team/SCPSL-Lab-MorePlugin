@@ -35,7 +35,9 @@ namespace LabMorePlugins
         public override Version RequiredApiVersion => new Version(LabApi.Features.LabApiProperties.CompiledVersion);
         public static Dictionary<string, PlayerData> playerData = new Dictionary<string, PlayerData>();
         private string dataFilePath;
+        public static string RootPath;
         public static string AdminLogs;
+        public static string ChatHistoryPath;
         public static readonly object KillCountsLock = new object();
         public static Dictionary<Player, int> killCounts = new Dictionary<Player, int>();
         public API.Events Events { get; set; } = new Events();
@@ -44,29 +46,46 @@ namespace LabMorePlugins
         {
             Instance = this;
             LabApi.Events.CustomHandlers.CustomHandlersManager.RegisterEventsHandler(Events);
-            string expFolder = Path.Combine(LabApi.Loader.Features.Paths.PathManager.LabApi.ToString(), "Exp");
+            RootPath = Path.Combine(LabApi.Loader.Features.Paths.PathManager.LabApi.ToString(),"LabMorePlugin");
+            if(!Directory.Exists(RootPath))
+            {
+                Directory.CreateDirectory(RootPath);
+            }
+            string expFolder = Path.Combine(RootPath, "Exp");
             if (!Directory.Exists(expFolder))
                 Directory.CreateDirectory(expFolder);
-
-            dataFilePath = Path.Combine(expFolder, $"{Server.Port}-Exp.json");
+            dataFilePath = Path.Combine(expFolder, $"Exp.json");
             if(!File.Exists(dataFilePath))
             {
                 File.Create(dataFilePath);
             }
-            AdminLogs = Path.Combine(LabApi.Loader.Features.Paths.PathManager.LabApi.ToString(), "AdminLogs", Server.Port.ToString(), "Log.txt");
+            var AdminLogPath = Path.Combine(RootPath, "AdminLogs");
+            if (!Directory.Exists(AdminLogPath))
+            {
+                Directory.CreateDirectory(AdminLogPath);
+            }
+            AdminLogs = Path.Combine(AdminLogPath, Server.Port.ToString(), "Log.txt");
             if (!File.Exists(AdminLogs))
             {
-                File.Create (AdminLogs);
+                File.Create(AdminLogs);
             }
+            ChatHistoryPath = Path.Combine(RootPath, "ChatHistory");
+            if(!Directory.Exists(ChatHistoryPath))
+            {
+                Directory.CreateDirectory(ChatHistoryPath);
+            }
+            Logger.Debug($"欢迎使用Lab-MorePlugin");
+            Logger.Debug("作者: 灰|QQ:3145186196");
+            Logger.Debug($"经验目录:[{dataFilePath}]");
+            Logger.Debug($"管理员命令日志:[{AdminLogs}]");
+            Logger.Debug($"聊天记录目录:[{ChatHistoryPath}]");
+            Logger.Debug("本项目已开源GUTHUB:https://github.com/114514-plugin-production-team/SCPSL-Lab-MorePlugin");
             LoadPlayerData();
             var harmony = new Harmony("hui.sl.moreplugin");
             harmony.PatchAll();
             PlayerEvents.Spawned += OnSpawned;
             PlayerEvents.Joined += OnJoined;
             PlayerEvents.Left += OnLeft;
-            Logger.Debug("SCP-SL-Lab多功能插件已启动");
-            Logger.Debug("本项目已开源GUTHUB:https://github.com/114514-plugin-production-team/SCPSL-Lab-MorePlugin");
-            Logger.Debug("插件作者:灰(QQ:3145186196)||如有BUG可以联系QQ本人不经常看Github");
         }
         public override void Disable()
         {
@@ -77,6 +96,7 @@ namespace LabMorePlugins
             PlayerEvents.Joined -= OnJoined;
             PlayerEvents.Left -= OnLeft;
             Logger.Debug("SCP-SL-Lab多功能插件已关闭");
+            Logger.Debug("本项目已开源GUTHUB:https://github.com/114514-plugin-production-team/SCPSL-Lab-MorePlugin");
         }
         public void LoadPlayerData()
         {

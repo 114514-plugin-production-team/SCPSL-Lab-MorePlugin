@@ -102,24 +102,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Ability\S106Black.cs" />
-    <Compile Include="API\AbilityManager.cs" />
     <Compile Include="API\Events.cs" />
     <Compile Include="API\SAPI.cs" />
     <Compile Include="API\SRoleSystem.cs" />
-    <Compile Include="API\SSSChat.cs" />
     <Compile Include="API\SSSS.cs" />
+    <Compile Include="API\TextChatSystem.cs" />
     <Compile Include="Class1.cs" />
     <Compile Include="Commands\ACChat.cs" />
     <Compile Include="Commands\BCChat.cs" />
-    <Compile Include="Commands\MyPos.cs" />
+    <Compile Include="Commands\KillmeCommand.cs" />
     <Compile Include="Commands\TeamChat.cs" />
+    <Compile Include="Enums\DamageType.cs" />
     <Compile Include="Enums\RoleName.cs" />
     <Compile Include="Enums\SCP914Enum.cs" />
     <Compile Include="Enums\ZoneNum.cs" />
-    <Compile Include="Interfaces\Ability.cs" />
-    <Compile Include="Interfaces\IAbility.cs" />
-    <Compile Include="MonoBehaviours\CooldownController.cs" />
     <Compile Include="Patchs\SCPChannelFixSecond.cs" />
     <Compile Include="PlayerData.cs" />
     <Compile Include="Plugin.cs" />
@@ -128,6 +124,9 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Ability\" />
+    <Folder Include="API\NBEvents\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

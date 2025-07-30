@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using LabApi.Features.Wrappers;
-using LabMorePlugins.Interfaces;
 using Mirror;
 using PlayerRoles;
 using PlayerRoles.Voice;

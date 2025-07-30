@@ -14,7 +14,6 @@ using LabApi.Events.Arguments.ServerEvents;
 using LabApi.Events.CustomHandlers;
 using LabApi.Features.Wrappers;
 using LabMorePlugins.Enums;
-using LabMorePlugins.Interfaces;
 using LabMorePlugins.Patchs;
 using MapGeneration.Distributors;
 using MEC;
@@ -22,6 +21,7 @@ using PlayerRoles;
 using PlayerRoles.PlayableScps.Scp079;
 using PlayerRoles.Spectating;
 using PlayerRoles.Subroutines;
+using PlayerStatsSystem;
 using RemoteAdmin;
 using System;
 using System.Collections.Generic;
@@ -336,6 +336,14 @@ namespace LabMorePlugins.API
                     if (Plugin.Instance.Config.SCP106Pock)
                     {
                         ev.Player.EnableEffect(new CustomPlayerEffects.PocketCorroding());
+                    }
+                    if (ev.DamageHandler.IsDamageType() == DamageType.Scp207)
+                    {
+                        ev.IsAllowed = false;
+                    }
+                    if (ev.DamageHandler.IsDamageType() == DamageType.Poison)
+                    {
+                        ev.IsAllowed = false;
                     }
                 }
             }

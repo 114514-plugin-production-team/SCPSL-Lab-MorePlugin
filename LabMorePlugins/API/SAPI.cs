@@ -4,9 +4,14 @@ using Interactables.Interobjects.DoorUtils;
 using InventorySystem.Items.Keycards;
 using InventorySystem.Items.ThrowableProjectiles;
 using LabApi.Features.Wrappers;
+using LabMorePlugins.Enums;
 using MapGeneration;
 using MEC;
 using PlayerRoles;
+using PlayerRoles.PlayableScps.Scp1507;
+using PlayerRoles.PlayableScps.Scp3114;
+using PlayerRoles.PlayableScps.Scp939;
+using PlayerStatsSystem;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,6 +31,136 @@ namespace LabMorePlugins.API
         public static List<Player> SpecialPlayerList = new List<Player>();
         public static readonly Dictionary<Player, AudioPlayer> PlayerAudioPlayers = new Dictionary<Player, AudioPlayer>();
         public static readonly Dictionary<Player, Speaker> PlayerSpeakers = new Dictionary<Player, Speaker>();
+        public static DamageType IsDamageType(this DamageHandlerBase handlerBase)
+        {
+            DamageHandlerBase @base = handlerBase;
+            if (@base !=null)
+            {
+                DamageType result;
+                if (@base is CustomReasonDamageHandler)
+                {
+                    return DamageType.Custom;
+                }
+                else if (@base is WarheadDamageHandler)
+                {
+                    return DamageType.Warhead;
+                }
+                else if (@base is ExplosionDamageHandler)
+                {
+                    return DamageType.Explosion;
+                }
+                else if (@base is Scp018DamageHandler)
+                {
+                    return DamageType.Scp018;
+                }
+                else if (@base is RecontainmentDamageHandler)
+                {
+                    return DamageType.Recontainment;
+                }
+                else if (@base is MicroHidDamageHandler)
+                {
+                    return DamageType.MicroHid;
+                }
+                else if (@base is DisruptorDamageHandler)
+                {
+                    return DamageType.ParticleDisruptor;
+                }
+                else if (@base is Scp939DamageHandler)
+                {
+                    return DamageType.Scp939;
+                }
+                else if (@base is JailbirdDamageHandler)
+                {
+                    return DamageType.Jailbird;
+                }
+                else if (@base is Scp1507DamageHandler)
+                {
+                    return DamageType.Scp1507;
+                }
+                else if (@base is Scp956DamageHandler)
+                {
+                    return DamageType.Scp956;
+                }
+                else if (@base is SnowballDamageHandler)
+                {
+                    return DamageType.SnowBall;
+                }
+                else if (@base is Scp3114DamageHandler scp3114DamageHandler)
+                {
+                    switch (scp3114DamageHandler.Subtype)
+                    {
+                        case Scp3114DamageHandler.HandlerType.Slap:
+                            result = DamageType.Scp3114;
+                            break;
+                        case Scp3114DamageHandler.HandlerType.Strangulation:
+                            result = DamageType.Strangled;
+                            break;
+                        case Scp3114DamageHandler.HandlerType.SkinSteal:
+                            result = DamageType.Scp3114;
+                            break;
+                        default:
+                            result = DamageType.Unknown;
+                            break;
+                    }
+                    return result;
+                }
+                else if (@base is Scp049DamageHandler scp049DamageHandler)
+                {
+                    switch (scp049DamageHandler.DamageSubType)
+                    {
+                        case Scp049DamageHandler.AttackType.Instakill:
+                            result = DamageType.Scp049;
+                            break;
+                        case Scp049DamageHandler.AttackType.CardiacArrest:
+                            result = DamageType.CardiacArrest;
+                            break;
+                        case Scp049DamageHandler.AttackType.Scp0492:
+                            result = DamageType.Scp0492;
+                            break;
+                        default:
+                            result = DamageType.Unknown;
+                            break;
+                    }
+                    return result;
+                }
+                else if (@base is Scp096DamageHandler)
+                {
+                    return DamageType.Scp096;
+                }
+                else if (DeathTranslations.Scp207.DeathscreenTranslation == @base.DeathScreenText)
+                {
+                    return DamageType.Scp207;
+                }
+                else if(DeathTranslations.Poisoned.DeathscreenTranslation == @base.DeathScreenText)
+                {
+                    return DamageType.Poison;
+                }
+                else if (DeathTranslations.Falldown.DeathscreenTranslation == @base.DeathScreenText)
+                {
+                    return DamageType.Falldown;
+                }
+                else if (DeathTranslations.Asphyxiated.DeathscreenTranslation == @base.DeathScreenText)
+                {
+                    return DamageType.Asphyxiation;
+                }
+                else if (DeathTranslations.Bleeding.DeathscreenTranslation == @base.DeathScreenText)
+                {
+                    return DamageType.Bleeding;
+                }
+                else if (DeathTranslations.PocketDecay.DeathscreenTranslation == @base.DeathScreenText)
+                {
+                    return DamageType.PocketDimension;
+                }
+                else
+                {
+                    return DamageType.Unknown;
+                }
+            }
+            else
+            {
+                return DamageType.Unknown;
+            }
+        }
         public static IEnumerable<Player> GetRole(RoleTypeId role)
         {
             return from player in Player.List

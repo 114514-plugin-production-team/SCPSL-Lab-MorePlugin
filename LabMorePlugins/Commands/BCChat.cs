@@ -1,6 +1,7 @@
 ﻿using CommandSystem;
 using LabApi.Features.Wrappers;
 using LabMorePlugins.API;
+using LabXWSPlugins.API;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +34,7 @@ namespace LabMorePlugins.Commands
                 return false;
             }
             string message = arguments.ElementAt(0);
-            SSSChat.AddText(SSSChat.ChatModles.BCChat, 5f, message, player);
+            TextChatSystem.SendMessage(player, message, TextChatSystem.MessageType.bcMessage);
             response = "OK";
             return true;
         }
