@@ -166,10 +166,7 @@ namespace LabXWSPlugins.API
                         AutoText = a => sb.ToString(),
                     };
                     player.AddHint(hint);
-                    Timing.CallDelayed(DisplayDuration, () =>
-                    {
-                        player.RemoveHint(hint);
-                    });
+                    hint.HideAfter(DisplayDuration);
                 }
             }
         }
@@ -196,10 +193,7 @@ namespace LabXWSPlugins.API
                 };
 
                 player.AddHint(hint);
-                Timing.CallDelayed(DisplayDuration, () =>
-                {
-                    player.RemoveHint(hint);
-                });
+                hint.HideAfter(DisplayDuration);
             }
         }
         private static void HandleTeamChatMessage(Player sender, ChatMessage message)
@@ -247,10 +241,7 @@ namespace LabXWSPlugins.API
                     };
 
                     player.AddHint(hint);
-                    Timing.CallDelayed(DisplayDuration, () =>
-                    {
-                        player.RemoveHint(hint);
-                    });
+                    hint.HideAfter(DisplayDuration);
                 }
             }
         }
