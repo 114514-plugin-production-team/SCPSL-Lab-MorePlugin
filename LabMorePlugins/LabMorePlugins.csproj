@@ -102,16 +102,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ability\BaseAbility.cs" />
+    <Compile Include="Ability\Scp106Ability.cs" />
+    <Compile Include="API\ChatSystem.cs" />
     <Compile Include="API\Events.cs" />
     <Compile Include="API\SAPI.cs" />
     <Compile Include="API\SRoleSystem.cs" />
     <Compile Include="API\SSSS.cs" />
-    <Compile Include="API\TextChatSystem.cs" />
     <Compile Include="Class1.cs" />
-    <Compile Include="Commands\ACChat.cs" />
-    <Compile Include="Commands\BCChat.cs" />
     <Compile Include="Commands\KillmeCommand.cs" />
-    <Compile Include="Commands\TeamChat.cs" />
+    <Compile Include="Commands\TextChatCommands.cs" />
     <Compile Include="Enums\DamageType.cs" />
     <Compile Include="Enums\RoleName.cs" />
     <Compile Include="Enums\SCP914Enum.cs" />
@@ -124,9 +124,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Ability\" />
-    <Folder Include="API\NBEvents\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

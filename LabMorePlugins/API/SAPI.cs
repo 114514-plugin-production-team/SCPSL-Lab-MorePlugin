@@ -401,6 +401,34 @@ namespace LabMorePlugins.API
 
             return false;
         }
+        private static readonly Dictionary<RoleTypeId, string> _roleTranslations = new Dictionary<RoleTypeId, string>
+            {
+                { RoleTypeId.ClassD, "D级人员" },
+                { RoleTypeId.Scientist, "科学家" },
+                { RoleTypeId.FacilityGuard, "设施警卫" },
+                { RoleTypeId.NtfPrivate, "九尾狐新兵" },
+                { RoleTypeId.NtfSergeant, "九尾狐士官" },
+                { RoleTypeId.NtfCaptain, "九尾狐长官" },
+                { RoleTypeId.NtfSpecialist, "九尾狐专家" },
+                { RoleTypeId.ChaosConscript, "混沌分裂者新兵" },
+                { RoleTypeId.ChaosRifleman, "混沌分裂者步枪兵" },
+                { RoleTypeId.ChaosRepressor, "混沌分裂者镇压者" },
+                { RoleTypeId.ChaosMarauder, "混沌分裂者掠夺者" },
+                { RoleTypeId.Scp049, "SCP-049" },
+                { RoleTypeId.Scp0492, "SCP-049-2" },
+                { RoleTypeId.Scp079, "SCP-079" },
+                { RoleTypeId.Scp096, "SCP-096" },
+                { RoleTypeId.Scp106, "SCP-106" },
+                { RoleTypeId.Scp173, "SCP-173" },
+                { RoleTypeId.Scp939, "SCP-939" },
+                { RoleTypeId.Tutorial, "教程角色" },
+                { RoleTypeId.None, "无角色" }
+            };
+
+        public static string GetChineseName(this RoleTypeId role)
+        {
+            return _roleTranslations.TryGetValue(role, out var name) ? name : role.ToString();
+        }
     }
 }
 

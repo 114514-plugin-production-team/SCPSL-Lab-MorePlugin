@@ -13,6 +13,7 @@ using LabApi.Events.Arguments.Scp914Events;
 using LabApi.Events.Arguments.ServerEvents;
 using LabApi.Events.CustomHandlers;
 using LabApi.Features.Wrappers;
+using LabMorePlugins.Ability;
 using LabMorePlugins.Enums;
 using LabMorePlugins.Patchs;
 using MapGeneration.Distributors;
@@ -363,6 +364,10 @@ namespace LabMorePlugins.API
         {
             if (ev.Player != null&&ev.Attacker!=null)
             {
+                if (ev.Player.Role == RoleTypeId.Scp106)
+                {
+                    Scp106Ability.OnPlayerDeathOrRoleChange(ev.Player.ReferenceHub);
+                }
                 if (SAPI.PlayerAudioPlayers.TryGetValue(ev.Player, out _))
                 {
                     SAPI.RemovePlayerAudio(ev.Player);
@@ -490,6 +495,12 @@ namespace LabMorePlugins.API
                 ev.Player.GetPlayerUi().CommonHint.ShowOtherHint("你打开了这道权限门", 6);
             }
         }
-
+        public override void OnPlayerChangedRole(PlayerChangedRoleEventArgs ev)
+        {
+            if (ev.OldRole == RoleTypeId.Scp106)
+            {
+                Scp106Ability.OnPlayerDeathOrRoleChange(ev.Player.ReferenceHub);
+            }
+        }
     }
 }
